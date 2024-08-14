@@ -55,6 +55,7 @@ jobs:
         with:
           version: "${{ steps.check-version.outputs.version }}"
           strategy: "docker"
+          root: "pyproject.toml"
 
       - name: Bump version for developmental release
         if: "! steps.tag-version.outputs.tagname"
