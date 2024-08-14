@@ -54,6 +54,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
           version: "${{ steps.check-version.outputs.version }}"
+          strategy: "manual"
 
       - name: Bump version for developmental release
         if: "! steps.tag-version.outputs.tagname"
