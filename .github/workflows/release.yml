@@ -50,16 +50,14 @@ jobs:
       - name: Tag new version if it doesn't exist
         id: tag-version
         if: steps.check-version.outputs.version
-        uses: butlerlogic/action-autotag@1.1.2
+        uses: bruno-fs/repo-tagger@1.0.0
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          version: "${{ steps.check-version.outputs.version }}"
-          # strategy: "docker"
-          root: "pyproject.toml"
+          tag: "${{ steps.check-version.outputs.version }}"
 
       - name: Bump version for developmental release
-        if: "! steps.tag-version.outputs.tagname"
+        if: "! steps.tag-version.outputs.tag"
         run: |
           poetry version patch &&
           version=$(poetry version -s) &&
@@ -70,11 +68,11 @@ jobs:
           poetry build --ansi
 
       - name: Publish package on PyPI
-        if: steps.tag-version.outputs.tagname
+        if: steps.tag-version.outputs.tag
         uses: pypa/gh-action-pypi-publish@v1.9.0
 
       - name: Publish package on TestPyPI
-        if: "! steps.tag-version.outputs.tagname"
+        if: "! steps.tag-version.outputs.tag"
         uses: pypa/gh-action-pypi-publish@v1.9.0
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -82,7 +80,7 @@ jobs:
       - name: Publish the release notes
         uses: release-drafter/release-drafter@v6.0.0
         with:
-          publish: ${{ steps.tag-version.outputs.tagname != '' }}
-          tag: ${{ steps.tag-version.outputs.tagname }}
+          publish: ${{ steps.tag-version.outputs.tag != '' }}
+          tag: ${{ steps.tag-version.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
